@@ -19,8 +19,9 @@ form.addEventListener('submit', function() {
     let title = form.title.value;
     let author = form.author.value;
     let category = form.category.value;
+    let isVerfied = false;
 
-    let bookObject = {title, author, category};
+    let bookObject = {title, author, category, isVerfied};
 
     console.log(baseUrl, bookObject);
 
@@ -39,4 +40,77 @@ form.addEventListener('submit', function() {
     })
     .catch((err) => console.error())
 
-})
+});
+
+//display books cards
+let box = document.getElementById('book-box');
+// let list = document.createElement('ul');
+// box.append(list);
+let bookData = [];
+
+getBookData();
+
+function getBookData() {
+    fetch(`${baseUrl}/books-me2`)
+    .then((res) => res.json())
+    .then((data) => bookData = data ? data : [])
+    .then(() => {
+        displayBooks();
+    })
+    .catch((err) => console.log(err))
+}
+
+
+function displayBooks(){
+    // getBookData();
+    console.log(bookData, 'books');
+
+    bookData.map((item, index) => {
+        let verifyStatus = item.isVerfied;
+        let card = document.createElement('div');
+        card.innerHTML = `<div class="card">
+                            <h3>Title: ${item.title}</h3>
+                            <h4>Author: ${item.author}</h4>
+                            <h5>Category: ${item.category}</h5>
+                            <h6>Availability Status: ${item.availability}</h6>
+                            <h6>Borrowed Days: ${item.borwDays}</h6>
+                        </div>`;
+        let verify = document.createElement('button');
+        verify.disabled = verifyStatus === true ? true : false;
+        verify.innerHTML = "Verify Book";
+        verify.addEventListener('click', () => {
+            if(confirm('Are you sure to verify..?')){
+                // console.log('verified')
+                verifyStatus = !item.isVerfied;
+                
+            };
+
+            fetch(`${baseUrl}/books-me2/${index+1}`, {
+                method: "PATCH",
+                headers: {
+                    "content-type": "application/json"
+                },
+                body: JSON.stringify({isVerfied: verifyStatus})
+            })
+        })
+
+        let deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = "Delete Book";
+        deleteBtn.addEventListener('click', () => {
+            if(confirm('Are you sure to Delete..?')){
+                
+
+                fetch(`${baseUrl}/books-me2/${index+1}`, {
+                    method: "DELETE"
+                })
+                .then(() => console.log('deleted'))
+                .catch((err) => console.log(err))
+            };
+        });
+
+        card.append(verify);
+        card.append(deleteBtn);
+        box.append(card);
+    })
+
+}

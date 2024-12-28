@@ -26,3 +26,17 @@ form select {
     margin: 0.6rem 2rem;
     height: 1.4rem;
 }
+
+#book-box{
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    justify-content: left;
+    gap: 2rem;
+}
+
+#book-box div {
+    border: 1px black;
+    border-radius: 8px;
+    background-color: azure;
+    padding: 0.6rem 1rem;
+}
